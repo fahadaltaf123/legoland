@@ -78,10 +78,7 @@ class ApiController extends Controller
 
         $decoded = json_decode(base64_decode(str_replace('_', '/', str_replace('-','+',explode('.', $token)[1]))),true);
 
-
         $user = User::find($decoded['sub']);
-//        die;
-//        $user = JWTAuth::authenticate($token);
 
         if($user and $user->status != 1){
             return response()->json([
@@ -89,6 +86,7 @@ class ApiController extends Controller
                 'message' => 'User not activated',
             ], 500);
         }
+        
         //Token created, return with success response and jwt token
         return response()->json([
             'success' => true,
