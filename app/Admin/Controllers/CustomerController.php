@@ -2,7 +2,7 @@
 
 namespace App\Admin\Controllers;
 
-use App\Models\Customers;
+use App\Models\User;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -24,12 +24,13 @@ class CustomerController extends AdminController
      */
     protected function grid()
     {
-        $grid = new Grid(new Customers());
+        $grid = new Grid(new User());
 
         $grid->column('id', __('Id'));
         $grid->column('name', __('Name'));
         $grid->column('email', __('Email'));
         $grid->column('phone', __('Phone'));
+        $grid->column('status', __('Status'));
         $grid->column('created_at', __('Created at'));
         $grid->column('updated_at', __('Updated at'));
 
@@ -44,7 +45,7 @@ class CustomerController extends AdminController
      */
     protected function detail($id)
     {
-        $show = new Show(Customers::findOrFail($id));
+        $show = new Show(User::findOrFail($id));
 
         $show->field('id', __('Id'));
         $show->field('name', __('Name'));
@@ -63,11 +64,13 @@ class CustomerController extends AdminController
      */
     protected function form()
     {
-        $form = new Form(new Customers());
+        $form = new Form(new User());
 
         $form->text('name', __('Name'));
         $form->email('email', __('Email'));
+        $form->password('password', __('Password'));
         $form->mobile('phone', __('Phone'));
+        $form->switch('status', __('Status'));
 
         return $form;
     }
