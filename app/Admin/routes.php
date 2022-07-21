@@ -13,4 +13,6 @@ Route::group([
 
     $router->get('/', 'HomeController@index')->name('home');
     $router->resource('customers', CustomerController::class);
+    $router->resource('tickets', TicketController::class);
+
 });
