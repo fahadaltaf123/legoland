@@ -3,6 +3,7 @@
 namespace App\Admin\Controllers;
 
 use App\Models\Tickets;
+use App\Models\User;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -81,18 +82,27 @@ class TicketController extends AdminController
     {
         $form = new Form(new Tickets());
 
-        $form->text('is_universal', __('Is universal'));
+        $users = User::where('status',1)->get();
+        $userArr = [];
+        foreach ($users as $user) {
+            $userArr[$user->id] = $user->name;
+        }
+
+        $form->select('customer_id', __('Customer id'))->options($userArr);
+
+        $form->date('visit_date', __('Visit date'))->default(date('Y-m-d H:i:s'));
+        $form->time('visit_time', __('Visit time'));
+
         $form->number('no_of_adults', __('No of adults'));
         $form->number('no_of_kids', __('No of kids'));
-        $form->number('status', __('Status'));
-        $form->number('customer_id', __('Customer id'));
-        $form->datetime('visit_date', __('Visit date'))->default(date('Y-m-d H:i:s'));
-        $form->text('visit_time', __('Visit time'));
+
+        $form->switch('is_universal', __('Is universal'));
+
         $form->decimal('total', __('Total'));
         $form->decimal('discount', __('Discount'));
         $form->decimal('after_discount', __('After discount'));
         $form->decimal('balance_due', __('Balance due'));
-
+        $form->switch('status', __('Status'));
         return $form;
     }
 }
