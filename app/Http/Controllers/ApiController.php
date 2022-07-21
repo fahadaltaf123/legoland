@@ -49,7 +49,7 @@ class ApiController extends Controller
         //valid credential
         $validator = Validator::make($credentials, [
             'email' => 'required|email',
-            'password' => 'required|string|min:6|max:50'
+            'password' => 'required|string|min:5|max:50'
         ]);
 
         //Send failed response if request is not valid
@@ -71,7 +71,17 @@ class ApiController extends Controller
         }
 
 
-        $user = JWTAuth::authenticate($token);
+        $request->request->set('token',$token);
+        $request->headers->set('Authorization Bearer ',$token);
+        $request->headers->set('Authorization','Bearer '.$token);
+//        $token = "your encrypted token goes here";
+
+        $decoded = json_decode(base64_decode(str_replace('_', '/', str_replace('-','+',explode('.', $token)[1]))),true);
+
+
+        $user = User::find($decoded['sub']);
+//        die;
+//        $user = JWTAuth::authenticate($token);
 
         if($user and $user->status != 1){
             return response()->json([

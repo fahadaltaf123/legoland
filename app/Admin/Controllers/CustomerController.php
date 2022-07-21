@@ -7,6 +7,7 @@ use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use Illuminate\Support\Facades\Hash;
 
 class CustomerController extends AdminController
 {
@@ -66,11 +67,25 @@ class CustomerController extends AdminController
     {
         $form = new Form(new User());
 
-        $form->text('name', __('Name'));
-        $form->email('email', __('Email'));
-        $form->password('password', __('Password'));
+        $form->text('name', __('Name'))->rules('required');
+        $form->email('email', __('Email'))->rules('required');
+//        $form->password('password', __('Password'));
+        $form->password('password', trans('admin.password'))->rules('confirmed|required');
+        $form->password('password_confirmation', trans('admin.password_confirmation'))->rules('required')
+            ->default(function ($form) {
+                return $form->model()->password;
+            });
+
         $form->mobile('phone', __('Phone'));
         $form->switch('status', __('Status'));
+
+        $form->ignore(['password_confirmation']);
+
+        $form->saving(function (Form $form) {
+            if ($form->password && $form->model()->password != $form->password) {
+                $form->password = Hash::make($form->password);
+            }
+        });
 
         return $form;
     }
