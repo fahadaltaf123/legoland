@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Tickets;
 use JWTAuth;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -67,16 +68,22 @@ class ApiController extends Controller
             }
         } catch (JWTException $e) {
             return $credentials;
-            return response()->json([
-                'success' => false,
-                'message' => 'Could not create token.',
-            ], 500);
         }
 
+
+        $user = JWTAuth::authenticate($token);
+
+        if($user and $user->status != 1){
+            return response()->json([
+                'success' => false,
+                'message' => 'User not activated',
+            ], 500);
+        }
         //Token created, return with success response and jwt token
         return response()->json([
             'success' => true,
             'token' => $token,
+            'user' => $user
         ]);
     }
 
@@ -115,7 +122,31 @@ class ApiController extends Controller
         ]);
 
         $user = JWTAuth::authenticate($request->token);
+        if($user and $user->status != 1){
+            return response()->json([
+                'success' => false,
+                'message' => 'User not activated',
+            ], 500);
+        }
 
         return response()->json(['user' => $user]);
+    }
+
+    public function getAllAssignedTickets(Request $request)
+    {
+        $this->validate($request, [
+            'token' => 'required'
+        ]);
+
+        $user = JWTAuth::authenticate($request->token);
+        if($user and $user->status != 1){
+            return response()->json([
+                'success' => false,
+                'message' => 'User not activated',
+            ], 500);
+        }
+
+        $tickets = Tickets::where('customer_id',$user->id)->get();
+        return response()->json(['tickets' => $tickets]);
     }
 }

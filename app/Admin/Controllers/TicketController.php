@@ -101,6 +101,12 @@ class TicketController extends AdminController
         $form->decimal('total', __('Total'));
         $form->decimal('discount', __('Discount'));
         $form->decimal('after_discount', __('After discount'));
+
+        $form->decimal('deposit_amt', __('Deposit Amount'));
+        $form->select('deposit_type', __('Deposit Type'))->options([
+            'cash'=>'Cash','card' => 'Credit Card'
+        ]);
+
         $form->decimal('balance_due', __('Balance due'));
         $form->switch('status', __('Status'));
         return $form;

@@ -17,6 +17,8 @@ use App\Http\Controllers\ApiController;
 
 Route::post('login', [ApiController::class, 'authenticate']);
 Route::post('register', [ApiController::class, 'register']);
+Route::post('user/details', [ApiController::class, 'get_user']);
+Route::post('user/tickets', [ApiController::class, 'getAllAssignedTickets']);
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
