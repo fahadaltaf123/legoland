@@ -86,7 +86,7 @@ class ApiController extends Controller
                 'message' => 'User not activated',
             ], 500);
         }
-        
+
         //Token created, return with success response and jwt token
         return response()->json([
             'success' => true,
@@ -156,5 +156,76 @@ class ApiController extends Controller
 
         $tickets = Tickets::where('customer_id',$user->id)->get();
         return response()->json(['tickets' => $tickets]);
+    }
+
+    public function authenticateByOrderPhone(Request $request)
+    {
+        $credentials = $request->only('ticket_id', 'phone_no');
+
+        //valid credential
+        $validator = Validator::make($credentials, [
+            'ticket_id' => 'required',
+            'phone_no' => 'required|string|min:5|max:50'
+        ]);
+
+        //Send failed response if request is not valid
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->messages()], 200);
+        }
+
+
+        $user = User::where('phone',$request->get('phone_no'))->first();
+
+        if($user and $user->status != 1) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User not activated',
+            ], 500);
+        }
+
+        $ticket = Tickets::find($request->get('ticket_id'));
+
+        if(!$ticket or $ticket->customer_id != $user->id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid Order Id',
+            ], 500);
+        }
+
+
+        //Token created, return with success response and jwt token
+        return response()->json([
+            'success' => true,
+            'user' => $user
+        ]);
+    }
+
+    public function getAllAssignedTicketsByOrderIdAndPhone(Request $request)
+    {
+        $this->validate($request, [
+            'ticket_id' => 'required',
+            'user_id' => 'required'
+        ]);
+
+        $user = User::find($request->get('user_id'));
+
+        if($user and $user->status != 1) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User not activated',
+            ], 500);
+        }
+
+        $ticket = Tickets::find($request->get('ticket_id'));
+
+        if(!$ticket or $ticket->customer_id != $user->id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid Order Id',
+            ], 500);
+        }
+
+//        $tickets = Tickets::where('customer_id',$user->id)->get();
+        return response()->json(['ticket' => $ticket]);
     }
 }
