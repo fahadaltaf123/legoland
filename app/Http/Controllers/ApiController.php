@@ -185,7 +185,14 @@ class ApiController extends Controller
 
         $ticket = Tickets::find($request->get('ticket_id'));
 
-        if(!$ticket or $ticket->customer_id != $user->id) {
+        if(!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid User Phone',
+            ], 500);
+        }
+
+        if(!$ticket or ($user and $ticket->customer_id != $user->id)) {
             return response()->json([
                 'success' => false,
                 'message' => 'Invalid Order Id',
