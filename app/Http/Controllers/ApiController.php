@@ -226,6 +226,6 @@ class ApiController extends Controller
         }
 
 //        $tickets = Tickets::where('customer_id',$user->id)->get();
-        return response()->json(['ticket' => $ticket]);
+        return response()->json(['ticket' => [$ticket]]);
     }
 }
